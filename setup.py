@@ -4,8 +4,8 @@ with open("README.md", "r") as fh:
     long_description = fh.read()
 
 setuptools.setup(
-    name="byb_lsl_driver", # Replace with your own username
-    version="0.0.1",
+    name="byb2lsl", # Replace with your own username
+    version="0.0.2",
     author="Johan Medrano",
     author_email="johan.medrano@umontpellier.fr",
     description="A driver to connect the Heart&Brain kit from Backyard Brain to the LabStreamingLayer.",

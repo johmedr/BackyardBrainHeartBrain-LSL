@@ -1,6 +1,6 @@
 import serial
 from serial.tools import list_ports
-from pylsl import StreamInfo, StreamOutlet, local_clock
+from pylsl import StreamInfo, StreamOutlet
 import threading
 import time
 
@@ -27,29 +27,22 @@ def convert_and_stream(outlet, ser, pause_dur):
             elapsed_time = time.process_time() - tstart
             outlet.push_chunk(data_float)
 
-
             if pause_dur > elapsed_time:
                 time.sleep((pause_dur - elapsed_time))
 
 
 baudrate = 230_400
 chunksize = 32
-samplingrate = 10_000.
-channelrate = 10_000
+samplingrate = 10_000
+stream_name = 'ByB Heart&Brain'
+stream_uid = "byb_heart_brain"
+stream_mode = "EEG"
+stream_type = "float32"
+stream_nchan = 1
+stream_chanrate = 10_000
 
 
 if __name__ == "__main__":
-
-    # first create a new stream info (here we set the name to BioSemi,
-    # the content-type to EEG, 1 channels, 10000 Hz, and float-valued data) The
-    # last value would be the serial number of the device or some other more or
-    # less locally unique identifier for the stream as far as available (you
-    # could also omit it but interrupted connections wouldn't auto-recover).
-    info = StreamInfo('ByB Heart&Brain', 'EEG', 1, channelrate, 'float32', 'byb_heart_brain')
-
-    # next make an outlet
-    outlet = StreamOutlet(info)
-
     ports = list_ports.comports()
     if len(ports) == 1:
         port = ports[0].device
@@ -64,7 +57,29 @@ if __name__ == "__main__":
         except IndexError:
             raise(IndexError("Invalid index"))
 
+    info = StreamInfo(stream_name, stream_mode, stream_nchan, stream_chanrate, stream_type, stream_uid)
+    outlet = StreamOutlet(info)
+
+    s = "LSL Driver for the Backyard Brain Heart and Brain kit"
+    print('#' * (len(s) + 4))
+    print('# %s #'%s)
+    print('#' * (len(s) + 4))
+
+    print('Connecting to %s w/ baudrate %d... '%(port, baudrate), end='')
+
     with serial.Serial(port, baudrate, timeout=1) as ser:
+        print("Connected. Sampling rate set to %d."%(samplingrate, ))
+
         t = threading.Thread(target=convert_and_stream, args=(outlet, ser, chunksize / samplingrate))
         t.run()
+
+        print("Driver running.")
+        print("Stream properties: ")
+        print("|- name: %s", stream_name)
+        print("|- uid: %s", stream_uid)
+        print("|- mode: %s", stream_mode)
+        print("|- channels: %s", stream_nchan)
+        print("|- rate: %s", stream_chanrate)
+        print("|- type: %s", stream_type)
+
         t.join()
