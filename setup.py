@@ -11,7 +11,7 @@ setuptools.setup(
     description="A driver to connect the Heart&Brain kit from Backyard Brain to the LabStreamingLayer.",
     long_description=long_description,
     long_description_content_type="text/markdown",
-    url="https://github.com/pypa/sampleproject",
+    url="https://github.com/yop0/BackyardBrainHeartBrain-LSL",
     packages=setuptools.find_packages(),
     classifiers=[
         "Programming Language :: Python :: 3",
