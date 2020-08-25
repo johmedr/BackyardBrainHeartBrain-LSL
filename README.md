@@ -13,8 +13,11 @@ Using [Pip](https://pypi.org/project/pip/)
 
 ## 3- Connect to OpenVibe
 Launch the program OpenVibe Acquisition Server. 
+
 In Driver, select "LabStreamingLayer". 
+
 In Driver Properties > Signal Stream, select "ByB Heart&Brain".
+
 In Preferences > Drift Correction, select "Let the driver decide". 
 
 ## 4- Use in OpenVibe Designer
