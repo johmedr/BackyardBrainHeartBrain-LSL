@@ -65,21 +65,19 @@ if __name__ == "__main__":
     print('# %s #'%s)
     print('#' * (len(s) + 4))
 
-    print('Connecting to %s w/ baudrate %d... '%(port, baudrate), end='')
-
     with serial.Serial(port, baudrate, timeout=1) as ser:
-        print("Connected. Sampling rate set to %d."%(samplingrate, ))
-
-        t = threading.Thread(target=convert_and_stream, args=(outlet, ser, chunksize / samplingrate))
-        t.run()
+        print("Connected to %s w/ baudrate %d. Sampling rate set to %dHz."%(port, baudrate, samplingrate, ))
 
         print("Driver running.")
-        print("Stream properties: ")
-        print("|- name: %s", stream_name)
-        print("|- uid: %s", stream_uid)
-        print("|- mode: %s", stream_mode)
-        print("|- channels: %s", stream_nchan)
-        print("|- rate: %s", stream_chanrate)
-        print("|- type: %s", stream_type)
+        print("# Stream properties: ")
+        print("## name:", stream_name)
+        print("## uid:", stream_uid)
+        print("## mode:", stream_mode)
+        print("## channels:", stream_nchan)
+        print("## rate: %dHz" % stream_chanrate)
+        print("## type:", stream_type)
 
+        t = threading.Thread(target=convert_and_stream, args=(outlet, ser, chunksize / samplingrate))
+
+        t.run()
         t.join()
