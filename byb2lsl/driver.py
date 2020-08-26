@@ -3,43 +3,46 @@ from serial.tools import list_ports
 from pylsl import StreamInfo, StreamOutlet
 import threading
 import time
+import numpy as np
 
 
-def byb_byte_to_float(high, low):
-    return float(int(low) + (int(high) & 127) << 7)
+def byb_byte_to_float(high: np.uint16, low: np.uint16) -> np.float32:
+    return np.float32(np.uint16(np.uint8(low) + (np.uint8(high & 127) << 7)))
 
 
-def convert_and_stream(outlet, ser, pause_dur):
+def convert_and_stream(outlet, ser, pause_dur, downsample: int):
     while True:
-        data_bytes = ser.read(2 * chunksize)
+        # tstart = time.process_time()
 
-        tstart = time.process_time()
+        data_bytes = ser.read(2 * downsample)
 
         if len(data_bytes) > 0:
-            if data_bytes[0] < 127:
+            if data_bytes[0] <= 127:
                 data_bytes = data_bytes[1:]
                 data_bytes += ser.read(1)
 
-            data_float = []
-            for i in range(chunksize):
-                data_float.append(byb_byte_to_float(data_bytes[0], data_bytes[1]))
+            data_float = [byb_byte_to_float(np.uint8(data_bytes[0]), np.uint8(data_bytes[1]))]
+            # for i in range(chunksize):
+            #     data_float.append(byb_byte_to_float(np.uint8(data_bytes[0]), np.uint8(data_bytes[1])))
 
-            elapsed_time = time.process_time() - tstart
-            outlet.push_chunk(data_float)
+            outlet.push_sample(data_float)
 
-            if pause_dur > elapsed_time:
-                time.sleep((pause_dur - elapsed_time))
-
+            #
+            # elapsed_time = time.process_time() - tstart
+            #
+            # if pause_dur > elapsed_time:
+            #     time.sleep((pause_dur - elapsed_time) / 2)
 
 baudrate = 230_400
-chunksize = 32
+chunksize = 20
 samplingrate = 10_000
+downsample = 10
 stream_name = 'ByB Heart&Brain'
 stream_uid = "byb_heart_brain"
 stream_mode = "EEG"
 stream_type = "float32"
 stream_nchan = 1
-stream_chanrate = 10_000
+stream_chanrate = samplingrate / downsample
 
 
 if __name__ == "__main__":
@@ -66,7 +69,8 @@ if __name__ == "__main__":
     print('#' * (len(s) + 4))
 
     with serial.Serial(port, baudrate, timeout=1) as ser:
-        print("Connected to %s w/ baudrate %d. Sampling rate set to %dHz."%(port, baudrate, samplingrate, ))
+        ser.read_until('\r')
+        print("Connected to %s w/ baudrate %d. Sampling rate set to %dHz, downsampled by %d"%(port, baudrate, samplingrate, downsample ))
 
         print("Driver running.")
         print("# Stream properties: ")
@@ -77,7 +81,7 @@ if __name__ == "__main__":
         print("## rate: %dHz" % stream_chanrate)
         print("## type:", stream_type)
 
-        t = threading.Thread(target=convert_and_stream, args=(outlet, ser, chunksize / samplingrate))
+        t = threading.Thread(target=convert_and_stream, args=(outlet, ser, downsample / samplingrate, downsample))
 
         t.run()
         t.join()
