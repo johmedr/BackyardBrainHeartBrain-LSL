@@ -1,4 +1,5 @@
-# Driver to stream data from BackyardBrain's Heart & Brain kit to the Lab Streaming Layer
+# byb2lsl
+A simple driver to stream data from BackyardBrain's Heart & Brain kit to the Lab Streaming Layer
 Example below shows how to use the driver with [OpenVibe](http://openvibe.inria.fr/) 
 ## 1- Installing the package
 Using [Pip](https://pypi.org/project/pip/) 
@@ -7,9 +8,10 @@ Using [Pip](https://pypi.org/project/pip/)
 ```
 
 ## 2- Launch the driver
-``` 
+```Bash
 > python -m byb2lsl.driver
 ```
+Note: use `python -m byb2lsl.driver --help` for usage infos. 
 
 ## 3- Connect to OpenVibe
 Launch the program OpenVibe Acquisition Server. 
