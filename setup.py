@@ -5,7 +5,7 @@ with open("README.md", "r") as fh:
 
 setuptools.setup(
     name="byb2lsl", # Replace with your own username
-    version="0.0.5",
+    version="0.0.6",
     author="Johan Medrano",
     author_email="johan.medrano@umontpellier.fr",
     description="A driver to connect the Heart&Brain kit from Backyard Brain to the LabStreamingLayer.",
@@ -21,7 +21,7 @@ setuptools.setup(
     install_requires=[
        'pylsl',
        'pyserial',
-        'numpy'
+        'numpy',
     ],
     python_requires='>=2.7',
 )
